@@ -20,8 +20,7 @@ from opentelemetry.instrumentation.openai import OpenAIInstrumentor
 
 
 def setup_tracing() -> None:
-    service_name = os.getenv("OTEL_SERVICE_NAME", "autogen-demo-bot")
-    provider = TracerProvider(resource=Resource({"service.name": service_name}))
+    provider = TracerProvider()
     provider.add_span_processor(BraintrustSpanProcessor(filter_ai_spans=True))
     provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
     trace.set_tracer_provider(provider)
@@ -118,7 +117,7 @@ async def main(task: Optional[str] = None) -> None:
         await Console(team.run_stream(task=task))
 
         await runtime.stop()
-        
+
     await model_client.close()
 
 

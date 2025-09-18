@@ -1,6 +1,6 @@
-## AutoGen Demo Bot with OpenTelemetry (Braintrust OTLP)
+## AutoGen Demo Bot with OpenTelemetry (Braintrust)
 
-A minimal AutoGen AgentChat demo with OpenTelemetry tracing exported via OTLP gRPC. Point the OTLP endpoint to your Braintrust-compatible collector.
+A minimal AutoGen AgentChat demo with OpenTelemetry using Braintrust's span processor. Spans are sent to Braintrust and also printed to the console for easy inspection.
 
 ### Docs
 - AutoGen Home: [link](https://microsoft.github.io/autogen/stable//index.html)
@@ -12,8 +12,11 @@ cd /Users/kenjiang/Development/autogen-sdk-demo
 python3 -m venv .venv
 ./.venv/bin/pip install -U pip
 ./.venv/bin/pip install -r requirements.txt
-cp .env.example .env
-# set OPENAI_API_KEY and adjust OTEL_* for your Braintrust collector
+cp .env.example .env  # optional
+# Set required env vars (at minimum):
+#   OPENAI_API_KEY=...
+#   OTEL_SERVICE_NAME=autogen-demo-bot  # optional
+# Braintrust SDK should be configured per your account (e.g., API key/project)
 ```
 
 ### Run
@@ -21,8 +24,9 @@ cp .env.example .env
 ./.venv/bin/python -m src.demo_bot
 ```
 
-### Configuration
-- `OTEL_EXPORTER_OTLP_ENDPOINT`: Your Braintrust OTLP gRPC collector, e.g., `http://localhost:4317` or your remote URL.
-- `OTEL_SERVICE_NAME`: Service name for tracing. Default is `autogen-demo-bot`.
-
-Traces include agent runtime spans and instrumented OpenAI calls.
+### Notes
+- Tracing is initialized in `src/demo_bot.py` with:
+  - `TracerProvider(resource={"service.name": OTEL_SERVICE_NAME or autogen-demo-bot})`
+  - `BraintrustSpanProcessor(filter_ai_spans=True)` for Braintrust export
+  - `SimpleSpanProcessor(ConsoleSpanExporter())` to print spans locally
+- No OTLP/Jaeger is used in this setup. If you prefer OTLP, switch back to an OTLP exporter and set appropriate env vars.
