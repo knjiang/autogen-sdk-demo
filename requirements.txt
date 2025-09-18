@@ -1,0 +1,6 @@
+autogen-agentchat
+autogen-core
+autogen-ext[openai]
+opentelemetry-sdk
+braintrust
+python-dotenv
